@@ -11,16 +11,21 @@ request.
 
 - [docker](docker) - Docker configuration for running TensorFlow on
   cluster managers.
+- [kubeflow](https://github.com/kubeflow/kubeflow) - A Kubernetes native platform for ML
+	* A K8s custom resource for running distributed [TensorFlow jobs](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#submitting-a-tensorflow-training-job) 
+	* Jupyter images for different versions of TensorFlow
+	* [TFServing](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#serve-a-model-using-tensorflow-serving) Docker images and K8s templates
 - [kubernetes](kubernetes) - Templates for running distributed TensorFlow on
   Kubernetes.
 - [marathon](marathon) - Templates for running distributed TensorFlow using
   Marathon, deployed on top of Mesos.
 - [hadoop](hadoop) - TFRecord file InputFormat/OutputFormat for Hadoop MapReduce
   and Spark.
+- [spark](spark) - Spark TensorFlow Connector
 
 ## Distributed TensorFlow
 
-See the [Distributed TensorFlow](https://www.tensorflow.org/versions/master/how_tos/distributed/index.html)
+See the [Distributed TensorFlow](https://www.tensorflow.org/deploy/distributed)
 documentation for a description of how it works. The examples in this
 repository focus on the most common form of distributed training: between-graph
 replication with asynchronous updates.
@@ -73,12 +78,11 @@ In this mode, each worker separately constructs the exact same graph. Each
 worker then runs the graph in isolation, only sharing gradients with the
 parameter servers. This set up is illustrated by the following diagram. Please
 note that each dashed box indicates a task.
-![Diagram for Between-graph replication]
-  (images/between-graph_replication.png "Between-graph Replication")
+![Diagram for Between-graph replication](images/between-graph_replication.png "Between-graph Replication")
 
 You must explicitly set the device before graph construction for this mode of
 training. The following code snippet from the
-[Distributed TensorFlow tutorial](https://www.tensorflow.org/versions/master/how_tos/distributed/index.html)
+[Distributed TensorFlow tutorial](https://www.tensorflow.org/deploy/distributed)
 demonstrates the setup:
 
 ```python

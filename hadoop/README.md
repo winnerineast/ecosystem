@@ -6,75 +6,51 @@ This can also be used with [Apache Spark](http://spark.apache.org/).
 
 ## Prerequisites
 
-1. [protoc 3.1.0](https://developers.google.com/protocol-buffers/)
-installed.
+1. [Apache Maven](https://maven.apache.org/)
 
-2. [Apache Maven](https://maven.apache.org/)
-
-3. Tested with Hadoop 2.6.0. Patches are welcome if there are incompatibilities
+2. Tested with Hadoop 2.6.0. Patches are welcome if there are incompatibilities
    with your Hadoop version.
+
+## Breaking changes
+
+* 08/20/2018 - Reverted artifactId back to `org.tensorflow.tensorflow-hadoop`
+* 05/29/2018 - Changed the artifactId from `org.tensorflow.tensorflow-hadoop` to `org.tensorflow.hadoop`
 
 ## Build and install
 
-1. Compile TensorFlow Example protos
-
-    ```sh
-    # Suppose $TF_SRC_ROOT is the source code root of TensorFlow project
-    protoc --proto_path=$TF_SRC_ROOT --java_out=src/main/java/ $TF_SRC_ROOT/tensorflow/core/example/{example,feature}.proto
-    ```
-
-2. Compile the code
+1. Compile the code
 
     ```sh
     mvn clean package
     ```
 
-3. Optionally install (or deploy) the jars
+    Alternatively, if you would like to build jars for a different version of TensorFlow, e.g., 1.5.0:
+
+    ```sh
+   mvn versions:set -DnewVersion=1.5.0
+   mvn clean package
+    ```
+
+2. Optionally install (or deploy) the jars
 
     ```sh
     mvn install
     ```
 
-    After installed (or deployed), the package can be used with following dependency:
+    After installation (or deployment), the package can be used with the following dependency:
 
     ```xml
     <dependency>
       <groupId>org.tensorflow</groupId>
       <artifactId>tensorflow-hadoop</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.10.0</version>
     </dependency>
     ```
+
 
 ## Use with MapReduce
 The Hadoop MapReduce example can be found [here](src/main/java/org/tensorflow/hadoop/example/TFRecordFileMRExample.java).
 
-## Use with Spark
-Spark support reading/writing files with Hadoop InputFormat/OutputFormat, the
-following code snippet demostrate the usage.
-
-```scala
-import com.google.protobuf.ByteString
-import org.apache.hadoop.io.{NullWritable, BytesWritable}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.tensorflow.example.{BytesList, Int64List, Feature, Features, Example}
-import org.tensorflow.hadoop.io.TFRecordFileOutputFormat
-
-val inputPath = "path/to/input.txt"
-val outputPath = "path/to/output.tfr"
-
-val sparkConf = new SparkConf().setAppName("TFRecord Demo")
-val sc = new SparkContext(sparkConf)
-
-var features = sc.textFile(inputPath).map(line => {
-  val text = BytesList.newBuilder().addValue(ByteString.copyFrom(line.getBytes)).build()
-  val features = Features.newBuilder()
-    .putFeature("text", Feature.newBuilder().setBytesList(text).build())
-    .build()
-  val example = Example.newBuilder()
-    .setFeatures(features)
-    .build()
-  (new BytesWritable(example.toByteArray), NullWritable.get())
-})
-
-features.saveAsNewAPIHadoopFile[TFRecordFileOutputFormat](outputPath)
-```
+## Use with Apache Spark
+The [Spark-TensorFlow-Connector](../spark/spark-tensorflow-connector) uses TensorFlow Hadoop to load and save
+TensorFlow's TFRecords format using Spark DataFrames.
